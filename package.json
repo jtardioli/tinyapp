@@ -1,0 +1,19 @@
+{
+  "name": "tinyapp",
+  "version": "1.0.0",
+  "description": "url shortener",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtardioli/tinyapp.git"
+  },
+  "author": "JT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jtardioli/tinyapp/issues"
+  },
+  "homepage": "https://github.com/jtardioli/tinyapp#readme"
+}
