@@ -1,3 +1,4 @@
+const { request } = require("express");
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -18,7 +19,16 @@ app.get("/urls", (req, res) => {
 
 });
 
+app.get("/urls/:shortURL", (req, res) => {
+  const short = req.params.shortURL;
+  const long = urlDatabase[short];
+  const templateVars = { shortURL: req.params.shortURL, longURL: long };
+  res.render("urls_show", templateVars);
+
+});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
+  
 });
