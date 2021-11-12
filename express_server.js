@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
     res.redirect('/urls');
     return;
   }
-  res.redirect('/login');
+  res.render('launch');
 });
 
 // Link to Long URL
@@ -80,7 +80,6 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   const templateVars = { user: currentUser, code: 404, message: 'This link if not avaliable'};
   res.render('error_handler', templateVars);
-  return;
 
 });
 

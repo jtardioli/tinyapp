@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html style="min-height: 100%;">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
 </head>
-<body>
+<body <% if(!user) { %> } style="background:url('https://images.unsplash.com/photo-1458970412976-755bf0c62f56?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'); background-size: cover;" <% } %>  >
   <%- include('partials/_header') %>
-  <main style="margin: 1em;">
+  <main  style="margin: 1em; ">
     <% if (!user) {%>
       <div class="card mx-auto w-50 " style="width: 18rem;">
         <div class="card-body">
-          <h3 class="card-title">Welcome</h5>
-            <p>Please <a href="/Login">Login</a> to view your URLs</p>
+          <h3 class="text-center card-title">Welcome</h5>
+            <p class="text-center">Please <a href="/Login">Login</a> to view your URLs</p>
   
         </div>
         
@@ -41,7 +41,7 @@
                 <td><%= urls[url] %></td>
                 <td>
                   <a href="/urls/<%= url %>">
-                    <button class="btn btn-outline-primary" >Edit</button>
+                    <button class="btn btn-outline-success" >Edit</button>
                   </a>
                 </td>
                 <form method="POST" action="/urls/<%= url %>/delete"><td>
