@@ -167,7 +167,7 @@ app.post("/urls", (req, res) => {
 //Edit
 app.post("/urls/:id", (req, res) => {
   const currentUser = users[req.cookies["user_id"]];
-  if (currentUser.id === urlDatabase[req.params.id].userID) {
+  if (currentUser && currentUser.id === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect(`/urls`);
     return;
@@ -178,7 +178,7 @@ app.post("/urls/:id", (req, res) => {
 // Delete
 app.post("/urls/:shortURL/delete", (req, res) => {
   const currentUser = users[req.cookies["user_id"]];
-  if (currentUser.id === urlDatabase[req.params.shortURL].userID) {
+  if (currentUser && currentUser.id === urlDatabase[req.params.shortURL].userID) {
     const shortURL = req.params.shortURL;
     delete urlDatabase[shortURL];
     res.redirect(`/urls`);
