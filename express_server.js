@@ -1,11 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+let morgan = require('morgan');
 const bcrypt = require('bcryptjs');
 const PORT = 8080; // default port 8080
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(morgan('dev'));
 app.set("view engine", "ejs");
 
 
@@ -36,7 +38,6 @@ const verifyLogin = (email, password) => {
   if (checkIfEmail) {
     for (let user in users) {
       if (users[user].email === email) {
-       
         if (bcrypt.compareSync(password, users[user].password)) {
           return users[user].id;
         }
