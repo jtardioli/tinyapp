@@ -36,6 +36,7 @@ app.get("/u/:shortURL", (req, res) => {
   const currentUser = users[req.session.user_id];
   // fetch shortURL id
   if (urlDatabase[req.params.shortURL]) {
+    urlDatabase[req.params.shortURL].timesVisited += 1;
     // fetch longURL id
     const link = urlDatabase[req.params.shortURL].longURL;
     res.redirect(link);
@@ -75,8 +76,16 @@ app.get("/urls/:shortURL", (req, res) => {
     urlDatabase[short] && // link exists in the database
   currentUser.id === urlDatabase[short].userID) { // user owns said link
 
+
     const long = urlDatabase[short].longURL;
-    const templateVars = {user: currentUser, shortURL: req.params.shortURL, longURL: long };
+    
+    const timesVisited = urlDatabase[short].timesVisited;
+    const date = urlDatabase[short].created.toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+    const templateVars = {user: currentUser, shortURL: req.params.shortURL, longURL: long, timesVisited, date };
     res.render("urls_show", templateVars);
     return;
   }
@@ -117,7 +126,9 @@ app.post("/urls", (req, res) => {
     // add new url to database
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
-      userID: req.session.user_id
+      userID: req.session.user_id,
+      timesVisited: 0,
+      created: new Date()
     };
     res.redirect(`urls/${shortURL}`);
     return;
