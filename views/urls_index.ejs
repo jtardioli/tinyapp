@@ -16,10 +16,7 @@
         <div class="card-body">
           <h3 class="text-center card-title">Welcome</h5>
             <p class="text-center">Please <a href="/Login">Login</a> to view your URLs</p>
-  
         </div>
-        
-      
       <% } else { %>
         <h3>My URLs</h3>
         <table class="table">
@@ -34,10 +31,7 @@
           <tbody>
             <% for(let url in urls) { %>
               <tr>
-           
                   <td>u/<%= url %></td>
-             
-                
                 <td><%= urls[url] %></td>
                 <td>
                   <a href="/urls/<%= url %>">
@@ -47,13 +41,12 @@
                 <form method="POST" action="/urls/<%= url %>?_method=DELETE"><td>
                   <button class="btn btn-outline-danger">Delete</button></td>
                 </form>
-                
+               
               </tr>
             <% } %>
           </tbody>
         </table>
         <% } %> 
-   
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
