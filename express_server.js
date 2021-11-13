@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 const {getUserByEmail, verifyLogin, generateRandomString, filteredURLs} = require('./helpers');
 const bcrypt = require('bcryptjs');
 const PORT = 8080; // default port 8080
@@ -13,6 +14,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }));
+app.use(methodOverride('_method'));
 app.set("view engine", "ejs");
 
 // Data
@@ -125,7 +127,7 @@ app.post("/urls", (req, res) => {
 });
 
 //Edit URL
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const currentUser = users[req.session.user_id];
   if (currentUser && // checl if user exists
     currentUser.id === urlDatabase[req.params.id].userID) { // check if url belongs to user
@@ -139,7 +141,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 // Delete URL
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL", (req, res) => {
   const currentUser = users[req.session.user_id];
   if (currentUser && // check for user
     currentUser.id === urlDatabase[req.params.shortURL].userID) { // check if url belongs to user
