@@ -1,20 +1,27 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const morgan = require('morgan');
-const cookieSession = require('cookie-session');
-const methodOverride = require('method-override');
-const {getUserByEmail, verifyLogin, generateRandomString, filteredURLs} = require('./helpers');
-const bcrypt = require('bcryptjs');
+const morgan = require("morgan");
+const cookieSession = require("cookie-session");
+const methodOverride = require("method-override");
+const {
+  getUserByEmail,
+  verifyLogin,
+  generateRandomString,
+  filteredURLs,
+} = require("./helpers");
+const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
 const app = express();
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(morgan('dev'));
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1', 'key2']
-}));
-app.use(methodOverride('_method'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan("dev"));
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["key1", "key2"],
+  })
+);
+app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
 // Data
@@ -25,10 +32,10 @@ const urlDatabase = {};
 app.get("/", (req, res) => {
   const currentUser = users[req.session.user_id];
   if (currentUser) {
-    res.redirect('/urls');
+    res.redirect("/urls");
     return;
   }
-  res.render('launch');
+  res.render("index");
 });
 
 // Link to Long URL
@@ -42,8 +49,12 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(link);
     return;
   }
-  const templateVars = { user: currentUser, code: 404, message: 'The link you tried to access is not avaliable'};
-  res.render('error_handler', templateVars);
+  const templateVars = {
+    user: currentUser,
+    code: 404,
+    message: "The link you tried to access is not avaliable",
+  };
+  res.render("error_handler", templateVars);
 });
 
 // Show URL
@@ -58,12 +69,12 @@ app.get("/urls", (req, res) => {
 // Create URL
 app.get("/urls/new", (req, res) => {
   const currentUser = users[req.session.user_id];
-  const templateVars = { user: currentUser};
+  const templateVars = { user: currentUser };
   if (currentUser) {
     res.render("urls_new", templateVars);
     return;
   }
-  res.redirect('/login');
+  res.redirect("/login");
 });
 
 //Edit URL
@@ -71,37 +82,47 @@ app.get("/urls/:shortURL", (req, res) => {
   const currentUser = users[req.session.user_id];
   const short = req.params.shortURL;
 
-  
-  if (currentUser && // check for current user
+  if (
+    currentUser && // check for current user
     urlDatabase[short] && // link exists in the database
-  currentUser.id === urlDatabase[short].userID) { // user owns said link
-
+    currentUser.id === urlDatabase[short].userID
+  ) {
+    // user owns said link
 
     const long = urlDatabase[short].longURL;
-    
+
     const timesVisited = urlDatabase[short].timesVisited;
-    const date = urlDatabase[short].created.toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+    const date = urlDatabase[short].created.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
-    const templateVars = {user: currentUser, shortURL: req.params.shortURL, longURL: long, timesVisited, date };
+    const templateVars = {
+      user: currentUser,
+      shortURL: req.params.shortURL,
+      longURL: long,
+      timesVisited,
+      date,
+    };
     res.render("urls_show", templateVars);
     return;
   }
-  const templateVars = { user: currentUser, code: 404, message: 'This link if not avaliable'};
-  res.render('error_handler', templateVars);
-
+  const templateVars = {
+    user: currentUser,
+    code: 404,
+    message: "This link if not avaliable",
+  };
+  res.render("error_handler", templateVars);
 });
 
 // Register
 app.get("/register", (req, res) => {
   const currentUser = users[req.session.user_id];
   if (currentUser) {
-    res.redirect('/urls');
+    res.redirect("/urls");
     return;
   }
-  const templateVars = {user: currentUser};
+  const templateVars = { user: currentUser };
   res.render("register", templateVars);
 });
 
@@ -109,10 +130,10 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const currentUser = users[req.session.user_id];
   if (currentUser) {
-    res.redirect('/urls');
+    res.redirect("/urls");
     return;
   }
-  const templateVars = {user: currentUser};
+  const templateVars = { user: currentUser };
   res.render("login", templateVars);
 });
 
@@ -128,79 +149,109 @@ app.post("/urls", (req, res) => {
       longURL: req.body.longURL,
       userID: req.session.user_id,
       timesVisited: 0,
-      created: new Date()
+      created: new Date(),
     };
     res.redirect(`urls/${shortURL}`);
     return;
   }
-  const templateVars = { user: currentUser, code: 401, message: 'You must be loged in to do that'};
-  res.render('error_handler', templateVars);
+  const templateVars = {
+    user: currentUser,
+    code: 401,
+    message: "You must be loged in to do that",
+  };
+  res.render("error_handler", templateVars);
 });
 
 //Edit URL
 app.put("/urls/:id", (req, res) => {
   const currentUser = users[req.session.user_id];
-  if (currentUser && // checl if user exists
-    currentUser.id === urlDatabase[req.params.id].userID) { // check if url belongs to user
+  if (
+    currentUser && // checl if user exists
+    currentUser.id === urlDatabase[req.params.id].userID
+  ) {
+    // check if url belongs to user
     // reset the long id
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect(`/urls`);
     return;
   }
-  const templateVars = { user: currentUser, code: 403, message: 'This link does not belong to you!'};
-  res.render('error_handler', templateVars);
+  const templateVars = {
+    user: currentUser,
+    code: 403,
+    message: "This link does not belong to you!",
+  };
+  res.render("error_handler", templateVars);
 });
 
 // Delete URL
 app.delete("/urls/:shortURL", (req, res) => {
   const currentUser = users[req.session.user_id];
-  if (currentUser && // check for user
-    currentUser.id === urlDatabase[req.params.shortURL].userID) { // check if url belongs to user
-      
+  if (
+    currentUser && // check for user
+    currentUser.id === urlDatabase[req.params.shortURL].userID
+  ) {
+    // check if url belongs to user
+
     const shortURL = req.params.shortURL;
     delete urlDatabase[shortURL];
     res.redirect(`/urls`);
     return;
   }
-  const templateVars = { user: currentUser, code: 403, message: 'This link does not belong to you!'};
-  res.render('error_handler', templateVars);
+  const templateVars = {
+    user: currentUser,
+    code: 403,
+    message: "This link does not belong to you!",
+  };
+  res.render("error_handler", templateVars);
 });
 
 //Login
 app.post("/login", (req, res) => {
   const currentUser = users[req.session.user_id];
-  const {email, password} = req.body;
+  const { email, password } = req.body;
   if (verifyLogin(email, password, users)) {
     req.session.user_id = verifyLogin(email, password, users);
-    res.redirect('/urls');
+    res.redirect("/urls");
     return;
   }
-  const templateVars = { user: currentUser, code: 401, message: 'Incorrect email or password'};
-  res.render('error_handler', templateVars);
+  const templateVars = {
+    user: currentUser,
+    code: 401,
+    message: "Incorrect email or password",
+  };
+  res.render("error_handler", templateVars);
 });
 
 // Logout
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
-  res.redirect('urls');
+  res.redirect("urls");
 });
 
 // Register
 app.post("/register", (req, res) => {
   const currentUser = users[req.session.user_id];
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   // check for blank input
   if (!email || !password) {
-    const templateVars = { user: currentUser, code: 400, message: 'Please fill out the entire form'};
-    res.render('error_handler', templateVars);
+    const templateVars = {
+      user: currentUser,
+      code: 400,
+      message: "Please fill out the entire form",
+    };
+    res.render("error_handler", templateVars);
     return;
   }
 
   // check if email is already im use
   if (getUserByEmail(email, users)) {
-    const templateVars = { user: currentUser, code: 409, message: 'That email is already taken'};
-    res.render('error_handler', templateVars);
+    const templateVars = {
+      user: currentUser,
+      code: 409,
+      message: "That email is already taken",
+    };
+    res.render("error_handler", templateVars);
     return;
   }
   //success
@@ -209,14 +260,12 @@ app.post("/register", (req, res) => {
   users[id] = {
     id,
     email,
-    password: hashedPassword
+    password: hashedPassword,
   };
   req.session.user_id = id;
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
